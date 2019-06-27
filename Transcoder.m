@@ -85,7 +85,7 @@ classdef Transcoder
             
             %--------------------------------------------------------------------------
             %this block of code doesnt let the algorithm fall in infinite
-            %recursion beacause of repeated feature vectors
+            %recursion because of repeated feature vectors
             a = zeros(size(data,1),10);
             b = ones(size(data,1),1)*9;
             
@@ -392,8 +392,6 @@ classdef Transcoder
             actCost = sum(actCost);
             optimCost = sum(optimCost);
         end
-            
-        
     end
     
 end

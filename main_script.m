@@ -19,7 +19,7 @@ transc_qp27 = transc_qp27.fitTree();
 %creates an instance of class Transcoder
 transc_qp32 = Transcoder(data_qp32);
 %fits a CBDT to the given data
-transc_qp32 = transc_qp32.fitTr ee();
+transc_qp32 = transc_qp32.fitTree();
 %evaluates the performance of the classifier
 [actCost_qp32, optimCost_qp32, accuracy_qp32] = transc_qp32.predictionsCostAndAccuracy(transc_qp32.tree.Root);
 

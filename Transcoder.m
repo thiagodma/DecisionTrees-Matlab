@@ -322,8 +322,6 @@ classdef Transcoder
             N = size(obj.data,1);
             obj.tree.Root = obj.data;
             
-            obj.data = [];
-            
             obj.tree = obj.treeInduction(obj.tree, N, 11, 0);
 
             obj.tree = obj.simplifyTree(obj.tree);

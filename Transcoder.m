@@ -326,6 +326,8 @@ classdef Transcoder
 
             obj.tree = obj.simplifyTree(obj.tree);
             
+            obj.tree = obj.cost_based_pruning(obj.tree);
+            
             toc
             fprintf('Finished training\n')
         end
@@ -390,6 +392,104 @@ classdef Transcoder
             actCost = sum(actCost);
             optimCost = sum(optimCost);
         end
+        
+        function outTree = cost_based_pruning(obj,tree_aux)
+            %This method prunes the tree in order to reduce the cost
+            %in the training set
+            
+            cond = ( (~isempty(tree_aux.RightGroup)) && (~isempty(tree_aux.LeftGroup)) && ...
+            (tree_aux.RightGroup.isLeaf == 1) && (tree_aux.LeftGroup.isLeaf == 1));
+        
+            %if the current node has two child leaf nodes
+            if(tree_aux.isLeaf==0 && cond)
+                %checks the best class for the parent node
+                [cost0_p,cost1_p] = obj.cost0Xcost1(tree_aux.Root);
+                [p_cost,p_class] = min([cost0_p,cost1_p]);
+                
+                %checks the costs for the leaf nodes
+                class_right = tree_aux.RightGroup.Class;
+                r_cost = sum(tree_aux.RightGroup.Root(:,12+class_right));
+                class_left = tree_aux.LeftGroup.Class;
+                l_cost = sum(tree_aux.LeftGroup.Root(:,12+class_left));
+                
+                %checks if the split was bad. If so, prunes the tree.
+                if(p_cost <= r_cost + l_cost)
+                    tree_aux.Class = p_class-1;
+                    tree_aux.LeftGroup = [];
+                    tree_aux.RightGroup = [];
+                    tree_aux.Feature = [];
+                    tree_aux.Value = [];
+                    tree_aux.isLeaf = [];
+                    fprint('mudou alguma coisa\n')
+                end
+            else
+                if(~isempty(tree_aux.RightGroup))
+                    if(tree_aux.RightGroup.isLeaf ~= 1)
+                        tree_aux.RightGroup = obj.cost_based_pruning(tree_aux.RightGroup);
+                    end
+                end
+            
+                cond = ( (~isempty(tree_aux.RightGroup)) && (~isempty(tree_aux.LeftGroup)) && ...
+                (tree_aux.RightGroup.isLeaf == 1) && (tree_aux.LeftGroup.isLeaf == 1));
+        
+                %if the current node has two child leaf nodes
+                if(tree_aux.isLeaf==0 && cond)
+                    %checks the best class for the parent node
+                    [cost0_p,cost1_p] = obj.cost0Xcost1(tree_aux.Root);
+                    [p_cost,p_class] = min([cost0_p,cost1_p]);
+                
+                    %checks the costs for the leaf nodes
+                    class_right = tree_aux.RightGroup.Class;
+                    r_cost = sum(tree_aux.RightGroup.Root(:,12+class_right));
+                    class_left = tree_aux.LeftGroup.Class;
+                    l_cost = sum(tree_aux.LeftGroup.Root(:,12+class_left));
+                
+                    %checks if the split was bad. If so, prunes the tree.
+                    if(p_cost <= r_cost + l_cost)
+                        tree_aux.Class = p_class-1;
+                        tree_aux.LeftGroup = [];
+                        tree_aux.RightGroup = [];
+                        tree_aux.Feature = [];
+                        tree_aux.Value = [];
+                        tree_aux.isLeaf = [];
+                    end
+                end
+                
+                if(~isempty(tree_aux.LeftGroup))
+                    if(tree_aux.LeftGroup.isLeaf ~= 1)
+                        tree_aux.LeftGroup = obj.cost_based_pruning(tree_aux.LeftGroup);
+                    end
+                end
+                
+                cond = ( (~isempty(tree_aux.RightGroup)) && (~isempty(tree_aux.LeftGroup)) && ...
+                (tree_aux.RightGroup.isLeaf == 1) && (tree_aux.LeftGroup.isLeaf == 1));
+        
+                %if the current node has two child leaf nodes
+                if(tree_aux.isLeaf==0 && cond)
+                    %checks the best class for the parent node
+                    [cost0_p,cost1_p] = obj.cost0Xcost1(tree_aux.Root);
+                    [p_cost,p_class] = min([cost0_p,cost1_p]);
+                
+                    %checks the costs for the leaf nodes
+                    class_right = tree_aux.RightGroup.Class;
+                    r_cost = sum(tree_aux.RightGroup.Root(:,12+class_right));
+                    class_left = tree_aux.LeftGroup.Class;
+                    l_cost = sum(tree_aux.LeftGroup.Root(:,12+class_left));
+                
+                    %checks if the split was bad. If so, prunes the tree.
+                    if(p_cost <= r_cost + l_cost)
+                        tree_aux.Class = p_class-1;
+                        tree_aux.LeftGroup = [];
+                        tree_aux.RightGroup = [];
+                        tree_aux.Feature = [];
+                        tree_aux.Value = [];
+                        tree_aux.isLeaf = [];
+                    end
+                end
+            end
+            outTree = tree_aux;
+        end
+        
     end
     
 end
